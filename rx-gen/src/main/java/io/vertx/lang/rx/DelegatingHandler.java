@@ -11,13 +11,15 @@ public class DelegatingHandler<U, V> implements Handler<U> {
   private final Function<U, V> mapper;
 
   public DelegatingHandler(Handler<V> handler, Function<U, V> mapper) {
-    this.handler = Objects.requireNonNull(handler);
+    this.handler = handler;
     this.mapper = Objects.requireNonNull(mapper);
   }
 
   @Override
   public void handle(U event) {
-    handler.handle(mapper.apply(event));
+    if (handler != null) {
+      handler.handle(mapper.apply(event));
+    }
   }
 
   @Override
@@ -25,11 +27,11 @@ public class DelegatingHandler<U, V> implements Handler<U> {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     DelegatingHandler<?, ?> that = (DelegatingHandler<?, ?>) o;
-    return handler.equals(that.handler);
+    return Objects.equals(handler, that.handler);
   }
 
   @Override
   public int hashCode() {
-    return handler.hashCode();
+    return Objects.hashCode(handler);
   }
 }
